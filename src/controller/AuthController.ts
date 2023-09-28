@@ -32,14 +32,43 @@ class AuthController {
                 )
                 foundUser.refreshToken = refreshToken
                 await userRepository.save(foundUser)
-
-                return res.json({ accessToken })
+                
+                res.cookie('jwt', refreshToken, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
+                res.json({ accessToken })
             } else {
                 res.sendStatus(401)
             }
         } catch (err) {
             res.status(500).json({status: err, message: err.message})
         }
+    }
+
+    static changePassword = async (req: Request, res: Response) => {
+        // check if password is sent
+        let {password, newPassword} = req.body
+        let username = req?.user
+        if (!(username && password)) return res.sendStatus(400) // Bad request
+
+        const userRepository = AppDataSource.getRepository(User)
+
+        try {
+            const foundUser = await userRepository.findOneBy({username})
+            if (!foundUser) return res.sendStatus(401)
+
+            const pwdMatch = await bcrypt.compare(password, foundUser.password)
+            if (pwdMatch) {
+                const hashedPwd = await bcrypt.hash(newPassword, 10)
+                foundUser.password = hashedPwd
+                userRepository.save(foundUser)
+                res.json({status: 'success', message: 'Password changed successfully.'})
+            } else {
+                res.sendStatus(401)
+            }
+        } catch (err) {
+            res.status(500).json({status: err, message: err.message})
+        }
+
+
     }
 }
  
