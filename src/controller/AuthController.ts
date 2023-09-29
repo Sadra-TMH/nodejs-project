@@ -33,11 +33,68 @@ class AuthController {
                 foundUser.refreshToken = refreshToken
                 await userRepository.save(foundUser)
                 
-                res.cookie('jwt', refreshToken, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
+                res.cookie('jwt', refreshToken, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000, sameSite: 'None', secure: true})
                 res.json({ accessToken })
             } else {
                 res.sendStatus(401)
             }
+        } catch (err) {
+            res.status(500).json({status: err, message: err.message})
+        }
+    }
+
+    static logout = async (req: Request, res: Response) => {
+        // check if username and password are sent
+        let cookies = req.cookies 
+        if (!cookies?.jwt) return res.sendStatus(204) // no content
+        let refreshToken = cookies.jwt
+
+        const userRepository = AppDataSource.getRepository(User)
+        try {
+            const foundUser = await userRepository.findOneBy({refreshToken})
+            if (!foundUser) {
+                res.cookie('jwt', {httpOnly: true, expires: +Date() - 1000, sameSite: 'None', secure: true})
+                return res.sendStatus(204)
+            } else {
+                foundUser.refreshToken = null;
+                userRepository.save(foundUser)
+
+                res.clearCookie('jwt', {httpOnly: true, expires: +Date() - 1000, sameSite: 'None', secure: true})
+                return res.sendStatus(204)
+            }
+           
+        } catch (err) {
+            res.status(500).json({status: err, message: err.message})
+        }
+    }    
+
+    static refreshToken = async (req: Request, res: Response) => {
+        // check if username and password are sent
+        let cookies = req.cookies 
+        if (!cookies?.jwt) return res.sendStatus(401) // Unauthorized
+        let refreshToken = cookies.jwt
+
+        const userRepository = AppDataSource.getRepository(User)
+        try {
+            const foundUser = await userRepository.findOneBy({refreshToken})
+            if (!foundUser) return res.sendStatus(403)
+
+            jwt.verify(
+                refreshToken,
+                process.env.REFRESH_TOKEN_SECRET,
+                (err, decoded) => {
+                    if (err || foundUser.username !== decoded.username) return res.sendStatus(403)
+                    const accessToken = jwt.sign(
+                        {username: decoded.username},
+                        process.env.ACCESS_TOKEN_SECRET,
+                        { expiresIn: '30s' }
+                    )
+                    res.json({ accessToken })
+                }
+            )
+
+            
+            
         } catch (err) {
             res.status(500).json({status: err, message: err.message})
         }

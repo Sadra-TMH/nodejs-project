@@ -1,7 +1,7 @@
 import * as express from "express"
 import * as bodyParser from "body-parser"
 import * as cors from "cors"
-import { Request, Response } from "express"
+import * as cookieParser from "cookie-parser"
 import { AppDataSource } from "./data-source"
 import routes from "./routes"
 import { User } from "./entity/User"
@@ -14,6 +14,7 @@ AppDataSource.initialize().then(async () => {
     app.use(helmet())
     app.use(cors())
     app.use(bodyParser.json())
+    app.use(cookieParser())
 
     app.use('/', routes)    
 
