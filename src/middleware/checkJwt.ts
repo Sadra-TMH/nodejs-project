@@ -5,7 +5,7 @@ dotenv.config();
 
 export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization'];
-    if (!authHeader) return res.sendStatus(401);
+    if (!authHeader?.startsWith('Bearer ')) return res.sendStatus(401);
 
     const token = authHeader.split(' ')[1];
 
