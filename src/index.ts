@@ -4,13 +4,14 @@ import * as cors from "cors";
 import * as cookieParser from "cookie-parser";
 import { AppDataSource } from "./data-source";
 import routes from "./routes";
-import { User } from "./entity/User";
 import helmet from "helmet";
+import { logger } from "./middleware/logger";
 
 AppDataSource.initialize()
   .then(async () => {
     // create express app
     const app = express();
+    app.use(logger);
     app.use(helmet());
     app.use(cors());
     app.use(bodyParser.json());
