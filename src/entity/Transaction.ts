@@ -30,7 +30,9 @@ export class Transaction {
   })
   amount: number;
 
-  @ManyToOne(() => Client, (client) => client.transactions)
+  @ManyToOne(() => Client, (client) => client.transactions, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({
     name: "client_id",
   })

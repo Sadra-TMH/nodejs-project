@@ -22,7 +22,24 @@ class ClientController {
         .status(201)
         .json({ status: true, message: "client created successfully." });
     } catch (err) {
-      res.sendStatus(500).json({ status: false, message: err.message });
+      res.status(500).json({ status: false, message: err.message });
+    }
+  }
+  static async delete(req: Request, res: Response) {
+    const { clientId } = req.params;
+
+    const clientRepo = AppDataSource.getRepository(Client);
+
+    try {
+      let client = await clientRepo.findOneBy({ id: parseInt(clientId) });
+
+      await clientRepo.delete(client.id);
+
+      res
+        .status(201)
+        .json({ status: true, message: "client deleted successfully." });
+    } catch (err) {
+      res.status(500).json({ status: false, message: err.message });
     }
   }
 }
