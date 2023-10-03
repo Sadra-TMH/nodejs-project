@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 
 @Entity()
-export class Person {
+export class Person  {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -25,7 +25,6 @@ export class Person {
 
   @Column({
     unique: true,
-    length: 10,
   })
   card_number: string;
 

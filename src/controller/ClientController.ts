@@ -1,14 +1,30 @@
-import {Request, Response} from 'express';
-import {AppDataSource} from '../data-source'
-import {User} from '../entity/User'
-import * as bcrypt from 'bcryptjs'
+import { Request, Response } from "express";
+import { AppDataSource } from "../data-source";
+import { Client } from "../entity/Client";
 
 class ClientController {
-    static async create(req: Request, res: Response) {
-        console.log('create');
-        res.sendStatus(200)
-        
+  static async create(req: Request, res: Response) {
+    const { first_name, last_name, email, card_number, balance } = req.body;
+
+    const clientRepo = AppDataSource.getRepository(Client);
+
+    try {
+      const newClient = new Client();
+      newClient.first_name = first_name;
+      newClient.last_name = last_name;
+      newClient.email = email;
+      newClient.card_number = card_number;
+      newClient.balance = balance;
+
+      await clientRepo.save(newClient);
+
+      res
+        .status(201)
+        .json({ status: true, message: "client created successfully." });
+    } catch (err) {
+      res.sendStatus(500).json({ status: false, message: err.message });
     }
+  }
 }
 
-export default ClientController
+export default ClientController;
