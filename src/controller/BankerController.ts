@@ -31,7 +31,7 @@ class BankerController {
     newBanker.first_name = first_name;
     newBanker.last_name = last_name;
     newBanker.email = email;
-    newBanker.card_number = card_number;
+    newBanker.card_number = card_number?.toString();
     newBanker.employee_number = employee_number;
     newBanker.clients = clients;
 
@@ -116,7 +116,7 @@ class BankerController {
     newBanker.first_name = first_name;
     newBanker.last_name = last_name;
     newBanker.email = email;
-    newBanker.card_number = card_number;
+    newBanker.card_number = card_number?.toString();
     newBanker.employee_number = employee_number;
     newBanker.clients = clients;
 
@@ -137,7 +137,7 @@ class BankerController {
     }
 
     // check for duplicates
-    let isUnique = await BankerController.bankerRepository
+    let isNotUnique = await BankerController.bankerRepository
       .createQueryBuilder("banker")
       .where(
         "banker.email = :email OR banker.card_number = :card_number OR banker.employee_number = :employee_number",
@@ -145,7 +145,7 @@ class BankerController {
       )
       .getOne();
 
-    if (isUnique) {
+    if (isNotUnique) {
       return res.status(400).json({
         status: false,
         message: "email, card_number, and employee_number should be unique.",

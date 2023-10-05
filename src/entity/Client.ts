@@ -10,21 +10,6 @@ export class Client extends Person {
   })
   balance: number;
 
-  @Column({
-    default: true,
-    name: "active",
-  })
-  is_active: boolean;
-
-  @Column({
-    type: "simple-json",
-    nullable: true,
-  })
-  additional_info: {
-    age: number;
-    hair_color: string;
-  };
-
   @OneToMany(() => Transaction, (transaction) => transaction.client)
   transactions: Transaction[];
 
@@ -33,10 +18,4 @@ export class Client extends Person {
   )
   bankers: Banker[];
   
-
-  @Column({
-    type: "simple-array",
-    nullable: true,
-  })
-  family_members: string[];
 }
