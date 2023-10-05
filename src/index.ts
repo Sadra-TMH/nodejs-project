@@ -6,6 +6,8 @@ import { AppDataSource } from "./data-source";
 import routes from "./routes";
 import helmet from "helmet";
 import { logger } from "./middleware/logger";
+const dotenv = require("dotenv");
+dotenv.config();
 
 AppDataSource.initialize()
   .then(async () => {

@@ -11,9 +11,6 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ nullable: true })
-  refreshToken: string;
-
   @Column('boolean', {default: false})
   isAdmin: boolean = false;
 
