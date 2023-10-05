@@ -77,6 +77,105 @@ class BankerController {
       res.status(500).json({ status: false, message: err.message });
     }
   }
+
+  static async update(req: Request, res: Response) {
+    const { id } = req.params;
+    if (parseInt(id)) {
+      let foundBanker = await BankerController.bankerRepository.findOneBy({
+        id,
+      });
+
+      if (!foundBanker) {
+        return res
+          .status(404)
+          .json({ status: false, message: "banker does not exist." });
+      }
+    } else {
+      return res
+        .status(404)
+        .json({ status: false, message: "invalid id parameter." });
+    }
+
+    const {
+      first_name,
+      last_name,
+      email,
+      card_number,
+      employee_number,
+      clients,
+    } = req.body;
+
+    const newBanker = new BankerValidator();
+    newBanker.first_name = first_name;
+    newBanker.last_name = last_name;
+    newBanker.email = email;
+    newBanker.card_number = card_number;
+    newBanker.employee_number = employee_number;
+    newBanker.clients = clients;
+
+    // validate inputs
+    const validationErrors = await validate(newBanker, {
+      validationError: { target: false, value: false },
+      skipMissingProperties: true,
+    }).then((errors) => {
+      if (errors.length > 0) {
+        return errors;
+      } else {
+        return false;
+      }
+    });
+
+    if (validationErrors) {
+      return res.status(400).json({ status: false, message: validationErrors });
+    }
+
+    // check for duplicates
+    let isUnique = await BankerController.bankerRepository
+      .createQueryBuilder("banker")
+      .where(
+        "banker.email = :email OR banker.card_number = :card_number OR banker.employee_number = :employee_number",
+        { email, card_number, employee_number }
+      )
+      .getOne();
+
+    if (isUnique) {
+      return res.status(400).json({
+        status: false,
+        message: "email, card_number, and employee_number should be unique.",
+      });
+    }
+    let banker = newBanker;
+
+    if (newBanker.clients) {
+      // get clients list
+      const clientsList = await BankerController.clientRepository
+        .createQueryBuilder("client")
+        .where("client.id IN (:...clients)", { clients: newBanker.clients })
+        .getMany();
+
+      let banker = { ...newBanker, clients: clientsList };
+    }
+
+    let foundBanker = await BankerController.bankerRepository.findOneBy({
+      id,
+    });
+
+    Object.keys(banker).forEach((key) =>
+      banker[key] === undefined
+        ? delete banker[key]
+        : (foundBanker[key] = banker[key])
+    );
+
+    try {
+      await BankerController.bankerRepository.save(foundBanker);
+
+      res
+        .status(201)
+        .json({ status: true, message: "banker updated successfully." });
+    } catch (err) {
+      res.status(500).json({ status: false, message: err.message });
+    }
+  }
 }
 
 export default BankerController;

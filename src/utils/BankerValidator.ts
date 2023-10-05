@@ -1,7 +1,14 @@
-import { IsArray, IsDefined, IsEmail, IsOptional, MaxLength, MinLength } from "class-validator";
+import {
+  IsArray,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  MaxLength,
+  MinLength,
+} from "class-validator";
 
 export class BankerValidator {
-  @IsDefined()
+  @IsNotEmpty()
   @MinLength(3, {
     message: "First Name is too short",
   })
@@ -16,11 +23,11 @@ export class BankerValidator {
   @MaxLength(20, {
     message: "Last Name is too long",
   })
-  @IsDefined()
+  @IsNotEmpty()
   last_name: string;
 
   @IsEmail()
-  @IsDefined()
+  @IsNotEmpty()
   email: string;
 
   @MinLength(5, {
@@ -29,10 +36,10 @@ export class BankerValidator {
   @MaxLength(10, {
     message: "Card Number is too long",
   })
-  @IsDefined()
+  @IsNotEmpty()
   card_number: string;
 
-  @IsDefined()
+  @IsNotEmpty()
   employee_number: string;
 
   @IsOptional()
