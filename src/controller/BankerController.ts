@@ -80,20 +80,19 @@ class BankerController {
 
   static async update(req: Request, res: Response) {
     const { id } = req.params;
-    if (parseInt(id)) {
-      let foundBanker = await BankerController.bankerRepository.findOneBy({
-        id,
-      });
-
-      if (!foundBanker) {
-        return res
-          .status(404)
-          .json({ status: false, message: "banker does not exist." });
-      }
-    } else {
+    if (!parseInt(id)) {
       return res
         .status(404)
         .json({ status: false, message: "invalid id parameter." });
+    }
+
+    let foundBanker = await BankerController.bankerRepository.findOneBy({
+      id,
+    });
+    if (!foundBanker) {
+      return res
+        .status(404)
+        .json({ status: false, message: "banker does not exist." });
     }
 
     const {
@@ -156,10 +155,6 @@ class BankerController {
       let banker = { ...newBanker, clients: clientsList };
     }
 
-    let foundBanker = await BankerController.bankerRepository.findOneBy({
-      id,
-    });
-
     Object.keys(banker).forEach((key) =>
       banker[key] === undefined
         ? delete banker[key]
@@ -174,6 +169,56 @@ class BankerController {
         .json({ status: true, message: "banker updated successfully." });
     } catch (err) {
       res.status(500).json({ status: false, message: err.message });
+    }
+  }
+
+  static async delete(req: Request, res: Response) {
+    const { id } = req.params;
+    if (!parseInt(id)) {
+      return res
+        .status(404)
+        .json({ status: false, message: "invalid id parameter." });
+    }
+
+    let foundBanker = await BankerController.bankerRepository.findOneBy({
+      id,
+    });
+
+    if (!foundBanker) {
+      return res
+        .status(404)
+        .json({ status: false, message: "banker does not exist." });
+    }
+
+    try {
+      await BankerController.bankerRepository.softDelete({ id });
+
+      res
+        .status(201)
+        .json({ status: true, message: "banker deleted successfully." });
+    } catch (err) {
+      res.status(500).json({ status: false, message: err.message });
+    }
+  }
+
+  static async getOne(req: Request, res: Response) {
+    const { id } = req.params;
+    if (!parseInt(id)) {
+      return res
+        .status(404)
+        .json({ status: false, message: "invalid id parameter." });
+    }
+
+    let foundBanker = await BankerController.bankerRepository.findOneBy({
+      id,
+    });
+
+    if (!foundBanker) {
+      return res
+        .status(404)
+        .json({ status: false, message: "banker does not exist." });
+    } else {
+      res.status(200).json(foundBanker);
     }
   }
 }

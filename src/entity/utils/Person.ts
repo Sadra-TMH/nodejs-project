@@ -2,13 +2,14 @@ import {
   BaseEntity,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 
 @Entity()
-export class Person  {
+export class Person {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -33,4 +34,7 @@ export class Person  {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @DeleteDateColumn()
+  deleted_at: Date;
 }
