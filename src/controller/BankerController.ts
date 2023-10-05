@@ -10,8 +10,10 @@ class BankerController {
   private static clientRepository = AppDataSource.getRepository(Client);
 
   static async getAll(req: Request, res: Response) {
-    let bankers = await BankerController.bankerRepository.find();
-
+    let bankers = await BankerController.bankerRepository
+      .createQueryBuilder("banker")
+      .leftJoinAndSelect("banker.clients", "client")
+      .getMany();
     return res.json(bankers);
   }
 
