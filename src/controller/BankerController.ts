@@ -9,6 +9,12 @@ class BankerController {
   private static bankerRepository = AppDataSource.getRepository(Banker);
   private static clientRepository = AppDataSource.getRepository(Client);
 
+  static async getAll(req: Request, res: Response) {
+    let bankers = await BankerController.bankerRepository.find();
+
+    return res.json(bankers);
+  }
+
   static async create(req: Request, res: Response) {
     const {
       first_name,

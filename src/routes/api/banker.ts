@@ -3,7 +3,7 @@ import BankerController from "../../controller/BankerController";
 
 const router = Router();
 
-router.route("/").post(BankerController.create);
+router.route("/").get(BankerController.getAll).post(BankerController.create);
 router
   .route("/:id")
   .get(BankerController.getOne)
