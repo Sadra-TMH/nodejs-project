@@ -1,12 +1,16 @@
-import {Router} from 'express'
+import { Router } from "express";
 import AuthController from "../controller/AuthController";
-// import { checkJwt } from "../middlewares/checkJwt";
+import { checkJwt } from "../middleware/checkJwt";
+import { checkRole } from "../middleware/checkRole";
 
-const router = Router()
+const router = Router();
 
-router.post('/login', AuthController.login)
+router.post("/login", AuthController.login);
 
-//Change my password
-// router.post("/change-password", [checkJwt], AuthController.changePassword);
+router.get("/logout", AuthController.logout);
 
-export default router
+router.get("/refresh", AuthController.refreshToken);
+
+router.post("/change-password", [checkJwt], AuthController.changePassword);
+
+export default router;
