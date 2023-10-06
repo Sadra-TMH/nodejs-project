@@ -217,9 +217,11 @@ class BankerController {
         .json({ status: false, message: "invalid id parameter." });
     }
 
-    let foundBanker = await BankerController.bankerRepository.findOneBy({
-      id,
-    });
+    let foundBanker = await BankerController.bankerRepository
+      .createQueryBuilder("banker")
+      .where("banker.id = :id", { id })
+      .leftJoinAndSelect("banker.clients", "client")
+      .getMany();
 
     if (!foundBanker) {
       return res

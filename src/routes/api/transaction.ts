@@ -3,8 +3,15 @@ import TransactionController from "../../controller/TransactionController";
 
 const router = Router();
 
-router.route("/").post(TransactionController.create);
+router
+  .route("/")
+  .get(TransactionController.getAll)
+  .post(TransactionController.create);
 
-router.route("/:id").delete(TransactionController.delete);
+router
+  .route("/:id")
+  .get(TransactionController.getOne)
+  .put(TransactionController.update)
+  .delete(TransactionController.delete);
 
 export default router;
